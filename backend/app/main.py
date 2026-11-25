@@ -1,7 +1,8 @@
 from pathlib import Path
+import asyncio
 from quart import Quart, jsonify, request, send_from_directory, redirect
 from app import seed
-from app.services import 目录, 装载, 结栏, 贯验, 夹具, 统计, 说明
+from app.services import 目录, 装载, 结栏, 贯验, 夹具, 统计, 说明, 汇总键契约
 
 _STATIC = Path(__file__).resolve().parent / "static"
 app = Quart(__name__)
@@ -60,7 +61,54 @@ async def api_缓冲():
 
 @app.get("/api/站点汇总账")
 async def api_汇总():
-    return jsonify(目录.汇总列表())
+    全量 = request.args.get("全量") in ("1", "true", "True", "是")
+    return jsonify(目录.汇总列表(全量=全量))
+
+
+@app.get("/api/汇总键裁决")
+async def api_汇总键裁决():
+    return jsonify(目录.汇总键裁决(
+        栏号=request.args.get("栏号") or None,
+        站点键=request.args.get("站点键") or None,
+        指标键=request.args.get("指标键") or None,
+        键=request.args.get("键") or None,
+    ))
+
+
+@app.get("/api/汇总键裁决只读")
+async def api_汇总键裁决别名():
+    return jsonify(目录.汇总键裁决(
+        栏号=request.args.get("栏号") or None,
+        站点键=request.args.get("站点键") or None,
+        指标键=request.args.get("指标键") or None,
+    ))
+
+
+@app.get("/api/汇总键契约")
+async def api_汇总键契约():
+    return jsonify(目录.汇总键契约())
+
+
+@app.get("/api/契约账册")
+async def api_契约账册():
+    return jsonify({"账册": 目录.契约账册列表(), "现行": 汇总键契约.现行契约()})
+
+
+@app.get("/api/错键归档")
+async def api_错键归档():
+    return jsonify(目录.错键归档列表())
+
+
+@app.post("/api/汇总键契约/切流")
+async def api_契约切流():
+    body = await request.get_json(force=True, silent=True) or {}
+    return jsonify(await asyncio.to_thread(目录.契约切流, body))
+
+
+@app.post("/api/汇总/回刷")
+async def api_汇总回刷():
+    body = await request.get_json(force=True, silent=True) or {}
+    return jsonify(await asyncio.to_thread(结栏.回刷汇总, body))
 
 
 @app.get("/api/坏点匣")
@@ -94,7 +142,9 @@ async def api_夹具装载(name: str):
 
 @app.post("/api/结栏/跑")
 async def api_结栏():
-    return jsonify(结栏.结当前栏())
+    body = await request.get_json(force=True, silent=True) or {}
+    # 放到线程：并发双请求会拿到两枚 sqlite 连接真实争用 BEGIN IMMEDIATE 锁。
+    return jsonify(await asyncio.to_thread(结栏.结当前栏, body))
 
 
 @app.get("/api/结栏/预览")

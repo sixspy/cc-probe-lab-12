@@ -246,3 +246,31 @@ th { color: var(--muted); font-weight: 600; background: rgba(0,0,0,0.2); }
 @media (max-width: 560px) {
   .阶段, .水位, .门槛条, .双栏 { grid-template-columns: 1fr; }
 }
+
+/* ===== 汇总键契约：契约票 / 缓冲卡片 / 裁决 ===== */
+code.票, .票 {
+  font-family: var(--display), ui-monospace, Menlo, Consolas, monospace;
+  color: var(--copper-soft);
+  word-break: break-all;
+}
+.门槛卡.契约卡 { border-color: rgba(58,166,160,0.55); }
+.门槛卡 .fp { margin-top: 4px; font-size: 11px; color: var(--teal); letter-spacing: .04em; }
+.卡阵 { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.键卡 {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  background: rgba(23,34,48,0.72);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.键卡顶 { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.键行 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.键标 {
+  font-size: 11px; letter-spacing: .12em; color: #06231f;
+  background: var(--teal); border-radius: 6px; padding: 2px 7px; font-weight: 700;
+}
+.键行 code.票 { font-size: 12.5px; }
+h3 { font-size: 15px; color: var(--copper-soft); margin: 10px 0 6px; }

@@ -49,11 +49,14 @@ function 渲染水位(el, o) {
 function 渲染门槛(el, 规) {
   if (!el) return;
   const r = 规 || {};
+  const fp = String(r["契约指纹"] || "");
+  const fp短 = fp ? fp.replace(/^pin-/, "pin·").slice(0, 14) : "—";
   el.innerHTML = `
     <div class="门槛卡"><div class="k">当前栏</div><div class="v">${安全文本(r["当前栏号"] || "—")}</div></div>
     <div class="门槛卡"><div class="k">PM25 上限</div><div class="v">${安全文本(r["PM25上限"] || "—")}</div></div>
     <div class="门槛卡"><div class="k">PM25 下限</div><div class="v">${安全文本(r["PM25下限"] || "—")}</div></div>
     <div class="门槛卡"><div class="k">标定偏移</div><div class="v">${安全文本(r["标定偏移上限"] || "—")}</div></div>
+    <div class="门槛卡 契约卡" title="${安全文本(r["契约编号规则"] || "汇总编号=汇-栏号-站点-指标")}"><div class="k">契约键 · 汇总键契约</div><div class="v 票">${安全文本(r["契约键示例"] || "汇-栏号-站点-指标")}</div><div class="fp">指纹 ${安全文本(fp短)}</div></div>
   `;
 }
 function 渲染批次表(el, rows, cols) {
@@ -86,8 +89,17 @@ function 填命运字典(el, dict) {
     `<div class="只读框 上距8"><b class="铜字">${安全文本(k)}</b> · ${安全文本(v)}</div>`
   ).join("");
 }
+function 契约票(栏号, 站点键, 指标键) {
+  return `汇-${栏号 || ""}-${站点键 || ""}-${指标键 || ""}`;
+}
+function 裁决调(v) {
+  if (v === "契约对齐") return "ok";
+  if (v === "历史契约") return "";
+  if (v === "缺失") return "";
+  return "warn"; // 错键 / 指纹不符 / 仅错键影子 / 键数不符
+}
 window.探栏 = {
   getJSON, postJSON, 行, 徽章, 空态, 安全文本, 命运色,
-  渲染水位, 渲染门槛, 渲染批次表,
+  渲染水位, 渲染门槛, 渲染批次表, 契约票, 裁决调,
   装载摘要文, 结栏摘要文, 贯验摘要文, 填命运字典,
 };
